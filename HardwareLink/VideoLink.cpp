@@ -1,6 +1,9 @@
 #include "VideoLink.h"
 #include <QDebug>
 #include <QMediaPlayer>
+#include <QMediaDevices>
+#include <QMediaCaptureSession>
+#include <QImageCapture>
 #include "ApplicationSettings.h"
 #include "VideoRecorder/CameraFrameGrabber.h"
 #include "HardwareLink/XPlaneVideoReceiver.h"
@@ -48,28 +51,45 @@ QObject *VideoLink::openVideoConnection(int connectionId)
     {
         // https://stackoverflow.com/questions/57352688/camera-start-error-on-qt5-5-qcamera-libv4l2-error-set-fmt-gave-us-a-differe
 
-        //auto cameraFrameGrabber = new CameraFrameGrabber(this, mirroring);
-        QByteArray camName = videoConnectionSetting->VideoFrameSourceCameraName->value().toLocal8Bit();
-        //auto camera = new QCamera(camName, this);
-        auto camera = new QCamera(this);
+        auto storedCamId = videoConnectionSetting->VideoFrameSourceCameraName->value();
+        foreach (const QCameraDevice &cameraInfo, QMediaDevices::videoInputs())
+            if (cameraInfo.id() == storedCamId)
+            {
+                auto camera = new QCamera(cameraInfo, this);
+                //auto cameraFrameGrabber = new CameraFrameGrabber(camera, connectionId, mirroring);
 
-        auto cameraFrameGrabber = new CameraFrameGrabber(camera, connectionId, mirroring);
+
+
+                auto captureSession = new QMediaCaptureSession();
+                captureSession->setCamera(camera);
+                auto imageCapture = new QImageCapture();
+
+                captureSession->setImageCapture(imageCapture);
+                camera->start();
+
+                connect(imageCapture, &QImageCapture::imageCaptured, [&](int id, const QImage &frame)
+                        {
+                            Q_UNUSED(id);
+
+                            QImage image = frame.convertToFormat(QImage::Format_ARGB32);
+                            qDebug() << "XXXXXX -  USB Cam";
+
+                        });
+
+
+
+
+                camera->start();
+                //videoSource = cameraFrameGrabber;
+                qDebug() << "Activate USB Cam";
+            }
+
 
         if (forceSetResolution)
         {
-            //QCameraViewfinderSettings viewfinderSettings;
-            //viewfinderSettings.setResolution(opticalDevice->frameWidth(), opticalDevice->frameHeight());
-            //camera->setViewfinderSettings(viewfinderSettings);
+
         }
-        //connect(camera, static_cast<void(QCamera::*)(QCamera::Error)>(&QCamera::error), this, &VideoLink::usbCameraError);
-        //connect(camera, SIGNAL(error(QCamera::Error)), this, SLOT(usbCameraError(QCamera::Error)));
 
-        //camera->setVideoSink(cameraFrameGrabber);
-//        connect(cameraFrameGrabber, &CameraFrameGrabber::frameAvailable, this, &VideoLink::videoFrameReceivedInternal, Qt::QueuedConnection);
-//        videoSource = cameraFrameGrabber;
-
-        camera->start();
-        //QCamera::supportedViewfinderResolutions()
         break;
     } // case VideoFrameTrafficSources::USBCamera
     case VideoFrameTrafficSources::XPlane:
@@ -94,13 +114,13 @@ QObject *VideoLink::openVideoConnection(int connectionId)
         videoSource = openVideoSourceWithURL(connectionId, QUrl::fromLocalFile(filePath), mirroring);
         break;
     } // case VideoFrameTrafficSources::VideoFile
-        //case VideoFrameTrafficSources::RTSP:
-        //{
-        //    auto rtspVideoReceiver = new RTSPVideoReceiver(this, connectionId, mirroring, QUrl(videoConnectionSetting->RTSPUrl->value()));
-        //    connect(rtspVideoReceiver, &RTSPVideoReceiver::frameAvailable, this, &VideoLink::videoFrameReceivedInternal, Qt::DirectConnection);
-        //    videoSource = rtspVideoReceiver;
-        //    break;
-        //}
+    //case VideoFrameTrafficSources::RTSP:
+    //{
+    //    auto rtspVideoReceiver = new RTSPVideoReceiver(this, connectionId, mirroring, QUrl(videoConnectionSetting->RTSPUrl->value()));
+    //    connect(rtspVideoReceiver, &RTSPVideoReceiver::frameAvailable, this, &VideoLink::videoFrameReceivedInternal, Qt::DirectConnection);
+    //    videoSource = rtspVideoReceiver;
+    //    break;
+    //}
     //case VideoFrameTrafficSources::MUSV2:
     //{
     //    auto musv2VideoReceiver = new MUSV2VideoReceiver(this, connectionId, mirroring, videoConnectionSetting->VideoFrameSourceMUSV2UDPPort->value());
@@ -130,14 +150,14 @@ QObject *VideoLink::openVideoSourceWithURL(quint32 videoConnectionId, const QUrl
     connect(frameGrabber, &CameraFrameGrabber::frameAvailable, this, &VideoLink::videoFrameReceivedInternal);
     // loop video
     connect(player, &QMediaPlayer::mediaStatusChanged, [player](QMediaPlayer::MediaStatus status)
-    {
-        if (status == QMediaPlayer::EndOfMedia)
-        {
-            qDebug() << "Restart the video file/stream playback.";
-            player->stop();
-            player->play();
-        }
-    });
+            {
+                if (status == QMediaPlayer::EndOfMedia)
+                {
+                    qDebug() << "Restart the video file/stream playback.";
+                    player->stop();
+                    player->play();
+                }
+            });
     player->play();
     return frameGrabber;
 }

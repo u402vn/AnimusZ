@@ -2,6 +2,7 @@
 #include <QSerialPortInfo>
 #include <QFile>
 #include <QRegularExpression>
+#include <QMediaDevices>
 #include "ConstantNames.h"
 
 // https://habrahabr.ru/post/149085/
@@ -20,20 +21,20 @@ const QString DefaultJoystickMapping = "a:b2,b:b1,x:b3,y:b0,back:b8,start:b9,lef
                                        "ty:a1,rightx:a2,righty:a4,lefttrigger:b6,righttrigger:b7,platform:Windows,";
 
 const QString DefaultBallisticMacro =
-        "// wind_direction, wind_speed, uav_lat, uav_lon, uav_hmsl, \n"
-        "// uav_groundspeed, uav_airspeed, uav_course, uav_airspeed, \n"
-        "// target_lat, target_lon, target_hmsl \n"
-        "// target_distance, target_azimuth, droppoint_time, droppoint_distance \n"
-        "// debug_info \n"
-        " \n"
-        "if (uav_groundspeed > 0) {\n"
-        "\t fallHeight = uav_hmsl - target_hmsl; \n"
-        "\t fallTime = Math.sqrt(2 * fallHeight / 9.80665); \n"
-        "\t bombOffset = uav_groundspeed * fallTime; \n"
-        "\t droppoint_distance = (target_distance - bombOffset * 0.92); \n"
-        "\t droppoint_time = droppoint_distance < 0 ? -1 : (droppoint_distance / uav_groundspeed + 0.5); \n"
-        "} else \n"
-        "\t droppoint_time = -1; \n";
+    "// wind_direction, wind_speed, uav_lat, uav_lon, uav_hmsl, \n"
+    "// uav_groundspeed, uav_airspeed, uav_course, uav_airspeed, \n"
+    "// target_lat, target_lon, target_hmsl \n"
+    "// target_distance, target_azimuth, droppoint_time, droppoint_distance \n"
+    "// debug_info \n"
+    " \n"
+    "if (uav_groundspeed > 0) {\n"
+    "\t fallHeight = uav_hmsl - target_hmsl; \n"
+    "\t fallTime = Math.sqrt(2 * fallHeight / 9.80665); \n"
+    "\t bombOffset = uav_groundspeed * fallTime; \n"
+    "\t droppoint_distance = (target_distance - bombOffset * 0.92); \n"
+    "\t droppoint_time = droppoint_distance < 0 ? -1 : (droppoint_distance / uav_groundspeed + 0.5); \n"
+    "} else \n"
+    "\t droppoint_time = -1; \n";
 
 
 void ApplicationSettings::addHIDButtonPrefs(HIDButton prefIndex, const QString &keyboardPrefName, const QString &keyboardPrefDefault,
@@ -811,12 +812,11 @@ const QString VideoConnectionSettings::description()
     {
     case VideoFrameTrafficSources::USBCamera:
     {
-        //auto cameraName = VideoFrameSourceCameraName->value().toLocal8Bit();
-        //QCameraDevice cameraInfo = QCameraDevice(cameraName);
-        //if (cameraInfo.isNull())
-            desc = tr("Unknown camera");
-        //else
-        //    desc = cameraInfo.description();
+        desc = tr("Unknown Camera");
+        auto storedCamId = VideoFrameSourceCameraName->value();
+        foreach (const QCameraDevice &cameraInfo, QMediaDevices::videoInputs())
+            if (cameraInfo.id() == storedCamId)
+                desc = cameraInfo.description();
         break;
     }
     case VideoFrameTrafficSources::XPlane:
@@ -844,6 +844,8 @@ const QString VideoConnectionSettings::description()
         desc = tr("UDP Port: %1").arg(VideoFrameSourceMUSV2UDPPort->value());
         break;
     }
+    default:
+        desc = tr("Unknown Device");
     }
 
     desc = QString("%1 %2").arg(ConstantNames::VideoFrameTrafficSourceCaptions()[source]).arg(desc);

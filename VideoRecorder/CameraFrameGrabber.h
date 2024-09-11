@@ -13,6 +13,9 @@ public:
     explicit CameraFrameGrabber(QObject *parent, quint32 videoConnectionId, bool verticalMirror);
 
     bool present(const QVideoFrame &frame);
+
+private slots:
+    void processFrameInternal(const QVideoFrame &frame);
 signals:
     void frameAvailable(const QImage &frame, quint32 videoConnectionId);
 };
