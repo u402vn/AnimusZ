@@ -298,15 +298,14 @@ QWidget *CameraSettingsEditor::createConnectionWidgets(int connectionId)
     foreach (const QCameraDevice &cameraInfo, QMediaDevices::videoInputs())
         cbUSBCamera->addItem(cameraInfo.description(), cameraInfo.id());
 
-    auto naeXPlane = new NetworkAddressEditor(this, &_association,
-                                              connectionSetting->VideoFrameSourceXPlaneAddress, connectionSetting->VideoFrameSourceXPlanePort);
+    auto naeXPlane = new NetworkAddressEditor(this, &_association, connectionSetting->VideoFrameSourceXPlaneAddress, connectionSetting->VideoFrameSourceXPlanePort);
 
     auto cbCalibrationImagePath = new QComboBoxExt(this);
     cbCalibrationImagePath->setEditable(true);
     cbCalibrationImagePath->addItem(DefaultCalibrationImagePath);
     cbCalibrationImagePath->addItem(":/CalibrationImages/Mira1.png");
 
-    auto fpsVideoFile = new FilePathSelector(this, tr("Video File"), tr("Select Video File"), tr("Video Files (*.avi)"));
+    auto fpsVideoFile = new FilePathSelector(this, tr("Video File"), tr("Select Video File"), tr("Video Files (*.avi *.mp4)"));
     fpsVideoFile->setLabelWidth(0);
 
     auto edRTSPUrl = new QLineEdit(this);

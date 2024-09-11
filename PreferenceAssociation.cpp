@@ -12,7 +12,7 @@ void PreferenceAssociation::addBindingInternal(PreferenceBinding *binding, Uniqu
         uniqueGroup->addBinding(binding);
         if (!_uniqueGroups.contains(uniqueGroup))
             _uniqueGroups.append(uniqueGroup);
-        connect(binding, &PreferenceBinding::editorValueChanged, uniqueGroup, &UniquePreferenceGroup::editorValueChanged, Qt::DirectConnection);
+        connect(binding, &PreferenceBinding::editorValueChanged, uniqueGroup, &UniquePreferenceGroup::editorValueChanged);
     }
 }
 
@@ -123,7 +123,8 @@ void PreferenceAssociation::fromEditor()
 void PreferenceAssociation::toEditor()
 {
     foreach (auto binding, _bindings)
-        binding->toEditor();
+       // if (binding != nullptr)
+            binding->toEditor();
 
     foreach (auto uniqueGroup, _uniqueGroups)
         uniqueGroup->highlightsDuplicates();
@@ -269,7 +270,7 @@ void PreferenceBindingColor::toEditor()
 PreferenceBindingInt::PreferenceBindingInt(ApplicationPreferenceInt *preference, QComboBoxExt *editor) :
     PreferenceBinding(preference, editor)
 {
-    connect(editor, static_cast<void (QComboBoxExt::*)(int)>(&QComboBoxExt::currentIndexChanged), this, &PreferenceBindingInt::currentIndexChanged, Qt::DirectConnection);
+    connect(editor, static_cast<void (QComboBoxExt::*)(int)>(&QComboBoxExt::currentIndexChanged), this, &PreferenceBindingInt::currentIndexChanged);
 }
 
 void PreferenceBindingInt::fromEditor()
@@ -391,7 +392,7 @@ void PreferenceBindingString2::toEditor()
 PreferenceBindingString3::PreferenceBindingString3(ApplicationPreferenceString *preference, QKeySequenceEdit *editor) :
     PreferenceBinding(preference, editor)
 {    
-    connect(editor, &QKeySequenceEdit::keySequenceChanged, this, &PreferenceBindingString3::keySequenceChanged, Qt::DirectConnection);
+    connect(editor, &QKeySequenceEdit::keySequenceChanged, this, &PreferenceBindingString3::keySequenceChanged);
 }
 
 void PreferenceBindingString3::fromEditor()
@@ -503,18 +504,18 @@ void PreferenceBindingEnum2::toEditor()
 PreferenceBindingString5::PreferenceBindingString5(ApplicationPreferenceString *preference, QPlainTextEdit *editor) :
     PreferenceBinding(preference, editor)
 {
-
+    qDebug() << "PreferenceBindingString5";
 }
 
 void PreferenceBindingString5::fromEditor()
 {
-    ((ApplicationPreferenceString *)_preference)->setValue(((QTextEdit *)_editor)->toPlainText());
+    ((ApplicationPreferenceString *)_preference)->setValue(((QPlainTextEdit *)_editor)->toPlainText());
     PreferenceBinding::fromEditor();
 }
 
 void PreferenceBindingString5::toEditor()
 {
-    ((QTextEdit *)_editor)->setPlainText(((ApplicationPreferenceString *)_preference)->value());
+    ((QPlainTextEdit *)_editor)->setPlainText(((ApplicationPreferenceString *)_preference)->value());
     PreferenceBinding::toEditor();
 }
 
