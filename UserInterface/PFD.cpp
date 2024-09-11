@@ -15,11 +15,13 @@ PFD::PFD(QWidget *parent) : qfi_PFD(parent)
     setContentsMargins(0, 0, 0, 0);
     //setMaximumWidth(500);
 
-    QSizePolicy policy(sizePolicy());
+    setMinimumSize(50, 50);
+    QSizePolicy policy(sizePolicy());    
     policy.setHeightForWidth(true);
     //policy.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
     //policy.setVerticalPolicy(QSizePolicy::MinimumExpanding);
     setSizePolicy(policy);
+    setVisible(true);
 }
 
 void PFD::showTelemetryDataFrame(const TelemetryDataFrame &telemetryFrame)

@@ -63,6 +63,7 @@ void BombingWidget::initWidgets()
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     auto mainSplitter = new QSplitter(Qt::Vertical, this);
+    mainSplitter->setContentsMargins(0, 0, 0, 0);
 
     auto markerWidget = new QWidget(this);
     auto markerLayout = new QGridLayout();

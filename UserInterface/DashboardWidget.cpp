@@ -11,8 +11,8 @@
 #include "Common/CommonUtils.h"
 #include "EnterProc.h"
 
-const char *PrimaryFlightDisplayActionId = "PFD";
-const char *CoordIndicatorDisplayActionId = "CI";
+const char * PrimaryFlightDisplayActionId = "PFD";
+const char * CoordIndicatorDisplayActionId = "CI";
 
 void DashboardWidget::setTelemetryTableRowDouble(int rowId, double value, int precision)
 {
@@ -37,7 +37,8 @@ DashboardWidget::DashboardWidget(QWidget *parent) : QWidget(parent)
     ApplicationSettings& applicationSettings = ApplicationSettings::Instance();
 
     auto instrumentsLayout = new QVBoxLayout(this);
-    this->setContentsMargins(0, 0, 0, 0);
+    //this->setContentsMargins(0, 0, 0, 0);
+    instrumentsLayout->setContentsMargins(0, 0, 0, 0);
     this->setLayout(instrumentsLayout);
 
     _PFD = new PFD(this);
@@ -72,8 +73,8 @@ DashboardWidget::DashboardWidget(QWidget *parent) : QWidget(parent)
     _telemetryTable->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     _telemetryTable->verticalHeader()->setDefaultSectionSize(18);
     _telemetryTable->verticalHeader()->setVisible(false);
-    connect(_telemetryTable, &QTableWidget::customContextMenuRequested, this, &DashboardWidget::onTelemetryTableContextMenuRequested, Qt::DirectConnection);
-    connect(_PFD, &PFD::customContextMenuRequested, this, &DashboardWidget::onTelemetryTableContextMenuRequested, Qt::DirectConnection);
+    connect(_telemetryTable, &QTableWidget::customContextMenuRequested, this, &DashboardWidget::onTelemetryTableContextMenuRequested);
+    connect(_PFD, &PFD::customContextMenuRequested, this, &DashboardWidget::onTelemetryTableContextMenuRequested);
 
     auto submenuUAV = new CheckableMenu(tr("UAV"), this);
     _menu->addMenu(submenuUAV);
@@ -149,6 +150,7 @@ DashboardWidget::DashboardWidget(QWidget *parent) : QWidget(parent)
     updateItemsVisibility();
 
     auto mainSplitter = new QSplitter(Qt::Vertical, this);
+    mainSplitter->setContentsMargins(0, 0, 0, 0);
 
     mainSplitter->addWidget(_PFD);
     mainSplitter->addWidget(_telemetryTable);
@@ -233,7 +235,9 @@ void DashboardWidget::onTelemetryTableContextMenuRequested(const QPoint &pos)
         action->setChecked(visibleRowsStr.contains(actionRowStr));
     }
 
-    _menu->exec(_telemetryTable->mapToGlobal(pos));
+    auto menuPos = _telemetryTable->mapToGlobal(pos);
+    //_menu->popup(menuPos);
+    _menu->exec(menuPos);
 
     visibleRowsStr.clear();
     foreach (auto action, _checkableItems)
@@ -261,8 +265,8 @@ void DashboardWidget::updateItemsVisibility()
             _telemetryTable->hideRow(i);
     }
 
-    _PFD->setVisible(visibleRowsStr.contains(PrimaryFlightDisplayActionId));
-    _coordIndicator->setVisible(visibleRowsStr.contains(CoordIndicatorDisplayActionId));
+    //_PFD->setVisible(visibleRowsStr.contains(PrimaryFlightDisplayActionId));
+    //_coordIndicator->setVisible(visibleRowsStr.contains(CoordIndicatorDisplayActionId));
 }
 
 void DashboardWidget::addParameter(DashboardWidget::TelemetryTableRow tableRow, const QString &name, QMenu *menu)

@@ -25,7 +25,7 @@ void CamControlsWidget::createTrackingButtons()
         QString caption = tr("Size %1x%1").arg(size);
         bool isChecked = size == currentTargetSize;
         auto acSizeItem = CommonWidgetUtils::createCheckableMenuGroupAction(caption, isChecked, _targetSizeGroup, _targetSizeMenu, size);
-        connect(acSizeItem, &QAction::triggered, this, &CamControlsWidget::onTargetSizeActionTriggered, Qt::DirectConnection);
+        connect(acSizeItem, &QAction::triggered, this, &CamControlsWidget::onTargetSizeActionTriggered);
 
         int key = shortCuts[i];
         QKeySequence shortCut(key);
@@ -145,7 +145,7 @@ void CamControlsWidget::createCamMoveControls()
     {
         _camKnob = nullptr;
         _camDials = new CamControlsWidgetDials(this);
-        connect(_camDials, &CamControlsWidgetDials::setCamPosition, _hardwareLink, &HardwareLink::setCamPosition, Qt::DirectConnection);
+        connect(_camDials, &CamControlsWidgetDials::setCamPosition, _hardwareLink, &HardwareLink::setCamPosition);
         _mainLayout->addWidget(_camDials,        row, 1, 1, 4, Qt::AlignCenter);
         _mainLayout->setRowStretch(row, 0);
     }
@@ -153,7 +153,7 @@ void CamControlsWidget::createCamMoveControls()
     {
         _camDials = nullptr;
         _camKnob = new CamControlsWidgetKnob(this);
-        connect(_camKnob, &CamControlsWidgetKnob::onCamMovingSpeedChange, this, &CamControlsWidget::onManualCamMovingSpeedChange, Qt::DirectConnection);
+        connect(_camKnob, &CamControlsWidgetKnob::onCamMovingSpeedChange, this, &CamControlsWidget::onManualCamMovingSpeedChange);
         _mainLayout->addWidget(_camKnob,        row, 1, 1, 4, Qt::AlignCenter);
         _mainLayout->setRowStretch(row, 0);
     }
@@ -172,7 +172,7 @@ void CamControlsWidget::createCamZoomControls()
     _camZoom->setTickInterval(1);
     _camZoom->setPageStep(1);
     _camZoom->setOrientation(Qt::Horizontal);
-    connect(_camZoom, &QSlider::valueChanged, this, &CamControlsWidget::onCamZoomValueChanged, Qt::DirectConnection);
+    connect(_camZoom, &QSlider::valueChanged, this, &CamControlsWidget::onCamZoomValueChanged);
     _camZoomIndicator = new QLabel(this);
 
     _btnLaserActivation = createButton(applicationSettings.hidUIHint(hidbtnLaserActivation), true, ":/laseractivate.png", &CamControlsWidget::onLaserActivationClick_Internal);
@@ -231,12 +231,12 @@ void CamControlsWidget::createCamViewControls()
     _grpCamButtons->addButton(btnCam1, OPTYCAL_SYSTEM_1);
     _grpCamButtons->addButton(btnCam2, OPTYCAL_SYSTEM_2);
     _grpCamButtons->addButton(btnCam3, OPTYCAL_SYSTEM_3);
-    connect(_grpCamButtons, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), this, &CamControlsWidget::onActiveOpticalSystemClicked, Qt::DirectConnection);
+    connect(_grpCamButtons, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), this, &CamControlsWidget::onActiveOpticalSystemClicked);
 
     _imageTuner = new VideoImageTuner(btnCam1);
     _imageTuner->resize(DEFAULT_BUTTON_WIDTH * 0.75, _imageTuner->height());
-    connect(_imageTuner, &VideoImageTuner::tuneImageChange, this, &CamControlsWidget::tuneImageChangeInternal, Qt::DirectConnection);
-    connect(_imageTuner, &VideoImageTuner::changeColorMode, this, &CamControlsWidget::onChangeColorMode, Qt::DirectConnection);
+    connect(_imageTuner, &VideoImageTuner::tuneImageChange, this, &CamControlsWidget::tuneImageChangeInternal);
+    connect(_imageTuner, &VideoImageTuner::changeColorMode, this, &CamControlsWidget::onChangeColorMode);
 
     //append buttons to grid
     int row = _mainLayout->rowCount();
@@ -414,9 +414,9 @@ QPushButtonEx *CamControlsWidget::createButton(const QString &toolTip, bool chec
 {
     auto button = CommonWidgetUtils::createButton(this, NO_CAPTION, toolTip, checkable, QUARTER_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, iconName);
     if (onClickMethod != nullptr)
-        connect(button, &QPushButtonEx::clicked, this, onClickMethod, Qt::DirectConnection);
+        connect(button, &QPushButtonEx::clicked, this, onClickMethod);
     if (onRightClick != nullptr)
-        connect(button, &QPushButtonEx::onRightClick, this, onRightClick, Qt::DirectConnection);
+        connect(button, &QPushButtonEx::onRightClick, this, onRightClick);
     return button;
 }
 
