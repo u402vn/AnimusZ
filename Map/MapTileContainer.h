@@ -43,7 +43,8 @@ enum MapBaseTileSource
     BingSatellite   = 6,
     MapsByMap       = 7,
     YandexMap       = 9,
-    ForestMap       = 10
+    ForestMap       = 10,
+    KMLMap          = 11
 };
 
 enum MapHybridTileSource
@@ -74,11 +75,12 @@ private:
     quint32 _uncommitedTilesCount;
 
     void connectToDatabase();
+    void connectToKMLDatabase();
     void processMapTileSources();
 public:
     TileDatabaseConnection(QObject *parent, const QString &fileName);
     ~TileDatabaseConnection();
-    QPixmap * getTileData(int x, int y, int scale, int sourceId);
+    QPixmap *getTileData(int x, int y, int scale, int sourceId);
     QSet<int> &getSupportedSources();
     QString getFileName();
     void saveTile(int sourceId, int scale, int x, int y, const QByteArray &tileImageRawData);

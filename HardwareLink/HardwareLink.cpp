@@ -68,10 +68,10 @@ HardwareLink::HardwareLink(QObject *parent) : VideoLink(parent)
     _udpExtTelemetryPort = applicationSettings.ExtTelemetryUDPPort;
 
     _delayTelemetryDataFrames = new TelemetryDelayLine(this, applicationSettings.VideoLagFromTelemetry);
-    connect(_delayTelemetryDataFrames, &TelemetryDelayLine::dequeue, this, &HardwareLink::onTelemetryDelayLineDequeue, Qt::DirectConnection);
+    connect(_delayTelemetryDataFrames, &TelemetryDelayLine::dequeue, this, &HardwareLink::onTelemetryDelayLineDequeue);
 
     _delayCameraTelemetryDataFrames  = new CameraTelemetryDelayLine(this, applicationSettings.VideoLagFromCameraTelemetry);
-    connect(_delayCameraTelemetryDataFrames, &CameraTelemetryDelayLine::dequeue, this, &HardwareLink::onCameraTelemetryDelayLineDequeue, Qt::DirectConnection);
+    connect(_delayCameraTelemetryDataFrames, &CameraTelemetryDelayLine::dequeue, this, &HardwareLink::onCameraTelemetryDelayLineDequeue);
 
     _commandTransports = applicationSettings.CommandTransport;
     _udpCommandAddress = QHostAddress(applicationSettings.CommandUDPAddress);
@@ -89,7 +89,7 @@ HardwareLink::HardwareLink(QObject *parent) : VideoLink(parent)
     if (applicationSettings.ObjectTrackerType == ObjectTrackerTypeEnum::External)
     {
         _trackerHardwareLink = new TrackerHardwareLink(this);
-        connect(_trackerHardwareLink, &TrackerHardwareLink::onTrackerCommandSent, this, &HardwareLink::doOnCommandSent, Qt::DirectConnection);
+        connect(_trackerHardwareLink, &TrackerHardwareLink::onTrackerCommandSent, this, &HardwareLink::doOnCommandSent);
     }
     else
         _trackerHardwareLink = nullptr;

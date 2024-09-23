@@ -27,7 +27,7 @@ void MapTileContainer::createTileDatabaseConnections(const QList<QString> &mapDa
         if (mapFile == downloadCasheDatabaseFile)
             continue;
 
-        TileDatabaseConnection *databaseConnection = new TileDatabaseConnection(this, mapFile);
+        auto databaseConnection = new TileDatabaseConnection(this, mapFile);
         auto supportedSources = databaseConnection->getSupportedSources();
 
         foreach (const int sourceId, supportedSources)
@@ -269,7 +269,7 @@ QPixmap * MapTileContainer::getTileImage(int tileX, int tileY, int scale, int so
     //try to make tile from other scales
     bool isHybridTile = isHybridTileSource(sourceId);
 
-    if ((resultTileImage == nullptr) && (!isHybridTile))
+    if ((resultTileImage == nullptr) && (!isHybridTile) && (sourceId != MapBaseTileSource::KMLMap))
     {
         if (scale > MIN_ZOOM_VALUE)
         {
@@ -658,8 +658,8 @@ void MapTileContainer::drawParallelsMeridians(QPainter *imagePainter)
     {
         double gridStepCandidateSec = gridStepsSec[i];
         needShowGrid = needShowGrid ||
-                ((latSecPerImage <= gridStepsSec[0])|| (lonSecPerImage <= gridStepsSec[0])) ||
-                ((gridStepCandidateSec < latSecPerImage) && (gridStepCandidateSec < lonSecPerImage));
+                       ((latSecPerImage <= gridStepsSec[0])|| (lonSecPerImage <= gridStepsSec[0])) ||
+                       ((gridStepCandidateSec < latSecPerImage) && (gridStepCandidateSec < lonSecPerImage));
         bool canShowGrid = (lonSecPerImage / gridStepCandidateSec * textRectangleWidth < imageWidth);
 
         if (needShowGrid && canShowGrid)
@@ -726,6 +726,7 @@ void MapTileContainer::fillSourceInfos()
     addSourceInfo(MapsByMap,       false, tr("Maps.By Map"));
     addSourceInfo(YandexMap,       false, tr("Yandex Map"));
     addSourceInfo(ForestMap,       false, tr("Forest Map"));
+    addSourceInfo(KMLMap,          false, tr("KML Map"));
 
     addSourceInfo(NoHybridTile,    true, tr("None"));
     addSourceInfo(YandexHybrid,    true, tr("Yandex hybrid"));
@@ -897,6 +898,35 @@ void TileDatabaseConnection::connectToDatabase()
     LOG_SQL_ERROR(_tileDatabase);
 }
 
+void TileDatabaseConnection::connectToKMLDatabase()
+{
+    EnterProc("TileDatabaseConnection::connectToKMLDatabase");
+
+    qInfo() << "Connect to KML Database: " << _fileName;
+
+    _databaseCounter++;
+
+    _tileDatabase =  QSqlDatabase::addDatabase("QSQLITE", QString("TileDatabase%1").arg(_databaseCounter));
+    _tileDatabase.setDatabaseName(_fileName);
+    _tileDatabase.setConnectOptions("OCI_ATTR_PREFETCH_ROWS=1;OCI_ATTR_PREFETCH_MEMORY=1"); //???
+    _tileDatabase.open();
+    LOG_SQL_ERROR(_tileDatabase);
+
+    EXEC_SQL(_tileDatabase, "PRAGMA journal_mode = MEMORY");
+
+    _selectTileQuery = new QSqlQuery(_tileDatabase);
+    _selectTileQuery->prepare("SELECT image, 2 FROM Tiles WHERE x=? AND y=? AND z=? AND 11 = ?");
+    LOG_SQL_ERROR(_selectTileQuery);
+
+    _insertTileQuery = nullptr;
+
+    _supportedSources.clear();
+    _supportedSources.insert(MapBaseTileSource::KMLMap);
+
+    _tileDatabase.transaction();
+    LOG_SQL_ERROR(_tileDatabase);
+}
+
 void TileDatabaseConnection::processMapTileSources()
 {
     EnterProc("TileDatabaseConnection::processMapTileSources");
@@ -923,7 +953,10 @@ TileDatabaseConnection::TileDatabaseConnection(QObject *parent, const QString &f
     EnterProc("TileDatabaseConnection::TileDatabaseConnection");
     _fileName = fileName;
     _uncommitedTilesCount = 0;
-    connectToDatabase();
+    if (fileName.endsWith(".kml", Qt::CaseInsensitive))
+        connectToKMLDatabase();
+    else
+        connectToDatabase();
 }
 
 TileDatabaseConnection::~TileDatabaseConnection()
@@ -939,10 +972,22 @@ QPixmap * TileDatabaseConnection::getTileData(int x, int y, int scale, int sourc
     EnterProc("TileDatabaseConnection::getTileData");
     QPixmap * resultTileImage = nullptr;
 
-    _selectTileQuery->addBindValue(x);
-    _selectTileQuery->addBindValue(y);
-    _selectTileQuery->addBindValue(scale);
-    _selectTileQuery->addBindValue(sourceId);
+
+    if (sourceId == MapBaseTileSource::KMLMap)
+    {
+        _selectTileQuery->addBindValue(x);
+        _selectTileQuery->addBindValue(y);
+        _selectTileQuery->addBindValue(17 - scale);
+        _selectTileQuery->addBindValue(sourceId);
+    }
+    else
+    {
+        _selectTileQuery->addBindValue(x);
+        _selectTileQuery->addBindValue(y);
+        _selectTileQuery->addBindValue(scale);
+        _selectTileQuery->addBindValue(sourceId);
+    }
+
 
     _selectTileQuery->exec();
     LOG_SQL_ERROR(_selectTileQuery);
@@ -1051,10 +1096,10 @@ bool MapTile::isEqual(int tileSourceId, int tileScale, int tileX, int tileY)
 MapTileHashValue MapTile::calculateMapTileHash(int sourceId, int scale, int x, int y)
 {
     MapTileHashValue value =
-            (sourceId & 0x000000FF) |       //0..7
-            ((scale & 0x0000001F) << 8) |   //8..12
-            ((x & 0x000003FF) << 13)|       //13..22
-            ((y & 0x000001FF) << 23);       //23..31
+        (sourceId & 0x000000FF) |       //0..7
+        ((scale & 0x0000001F) << 8) |   //8..12
+        ((x & 0x000003FF) << 13)|       //13..22
+        ((y & 0x000001FF) << 23);       //23..31
     return value;
 }
 

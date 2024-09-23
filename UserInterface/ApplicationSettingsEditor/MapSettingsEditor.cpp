@@ -76,7 +76,7 @@ void MapSettingsEditor::saveSettings()
 
 FilePathSelector *MapSettingsEditor::addDBPathEditor(QVBoxLayout *layout, const QString &caption)
 {
-    auto pathSelector = new FilePathSelector(this, caption, tr("Open %1 Database File").arg(caption), tr("Database Files (*.db)"));
+    auto pathSelector = new FilePathSelector(this, caption, tr("Open %1 Database File").arg(caption), tr("Database Files (*.db);;KML Files (*.kml)"));
     if (layout != nullptr)
         layout->addWidget(pathSelector);
 

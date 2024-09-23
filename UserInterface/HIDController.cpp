@@ -40,7 +40,7 @@ HIDController::HIDController(QObject *parent) : QObject(parent)
     if (applicationSettings.JoystickUsing)
     {
         _joystick = new Joystick(this, applicationSettings.JoystickMapping, JOYSTICK_TIME_INTERVAL);
-        connect(_joystick, &Joystick::processJoystick, this, &HIDController::processJoystick, Qt::DirectConnection);
+        connect(_joystick, &Joystick::processJoystick, this, &HIDController::processJoystick);
     }
 
     _keyboardUsing = applicationSettings.KeyboardUsing;
@@ -405,9 +405,9 @@ HIDMapItem::HIDMapItem(HIDController *parent, void(HIDController::*onPressMethod
     _joystickButtonWasPressed = false;
 
     if (onPressMethod != nullptr)
-        connect(this, &HIDMapItem::processPressEvent, parent, onPressMethod, Qt::DirectConnection);
+        connect(this, &HIDMapItem::processPressEvent, parent, onPressMethod);
     if (onReleaseMethod != nullptr)
-        connect(this, &HIDMapItem::processReleaseEvent, parent, onReleaseMethod, Qt::DirectConnection);
+        connect(this, &HIDMapItem::processReleaseEvent, parent, onReleaseMethod);
 }
 
 void HIDMapItem::processJoystick(const QList<bool> &buttons)

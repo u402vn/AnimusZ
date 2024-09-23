@@ -119,6 +119,7 @@ void MapTileDownloader::needTile(int sourceId, int scale, int x, int y)
     }
 
     case ForestMap:
+    case KMLMap:
     case NoBaseTile:
     case NoHybridTile:
     {
