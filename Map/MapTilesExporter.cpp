@@ -134,7 +134,7 @@ void MapTilesExporter::AddExportTask(int sourceId, int scale, const WorldGPSCoor
 void MapTilesExporter::RunExport(const QString &destDB)
 {
     _cancelExecution = false;
-    //???QtConcurrent::run(this, &MapTilesExporter::processExport, _tasks, destDB);
+    QtConcurrent::run(&MapTilesExporter::processExport, this, _tasks, destDB);
 }
 
 void MapTilesExporter::clear()

@@ -28,6 +28,7 @@ class MapTileExportDialog final: public QDialog
     MapTileContainer * _mapTileContainer;
     MapTilesExporter _mapTilesExporter;
     QProgressDialog * _progressDlg;
+    QPushButton *_exportButton;
 
     void initWidgets();
     void showCoordValues();

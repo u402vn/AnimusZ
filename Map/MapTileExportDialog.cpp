@@ -105,7 +105,7 @@ void MapTileExportDialog::initWidgets()
     row++;
 
     auto buttonBox = new QDialogButtonBox(this);
-    buttonBox->addButton(tr("Export"), QDialogButtonBox::AcceptRole);
+    _exportButton = buttonBox->addButton(tr("Export"), QDialogButtonBox::AcceptRole);
     buttonBox->addButton(QDialogButtonBox::Cancel);
     buttonBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &MapTileExportDialog::accept);
@@ -225,6 +225,7 @@ void MapTileExportDialog::onExportProcessChanged(double processedPrecent)
 void MapTileExportDialog::onExportProcessEnded()
 {
     _progressDlg->close();
+    _exportButton->setEnabled(true);
 }
 
 void MapTileExportDialog::showCoordValues()
@@ -257,6 +258,7 @@ void MapTileExportDialog::runExport()
         _mapTilesExporter.AddExportTask(sourceId, scale, _coordLeftTop, _coordRightBottom, sourceDBFiles);
     }
 
+    _exportButton->setEnabled(false);
     _progressDlg->reset();
     _mapTilesExporter.RunExport(targetDatabaseFileName);
 }

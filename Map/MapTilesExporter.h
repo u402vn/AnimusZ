@@ -23,9 +23,11 @@ class MapTilesExporter final : public QObject
     bool _cancelExecution;
     QList<ExportTask> _tasks;
 
-    void processExport(const QList<ExportTask> tasks, const QString destDB);
+
     void prepareProgressDialog(int tileTotalCount);
 public:
+    void processExport(const QList<ExportTask> tasks, const QString destDB);
+
     explicit MapTilesExporter(QObject *parent = nullptr);
     ~MapTilesExporter();
 
