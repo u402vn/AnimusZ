@@ -6,6 +6,7 @@
 #include <QTimerEvent>
 #include <QVector>
 #include <QTcpServer>
+#include <QImage>
 #include "ApplicationSettings.h"
 
 #pragma pack(push, 1)
@@ -75,6 +76,7 @@ class UAVSimDataSender : public QObject
     QTcpServer *_tcpVideoServer;
     QTcpSocket *_clientConnection;
 
+    QImage _frame;
     int _telemetryTimerId;
     int _videoTimerId;
 

@@ -2,10 +2,11 @@
 #include "HardwareLink/lz4.h"
 #include "DataAccess/csv.h"
 #include <QFileInfo>
-#include <QImage>
 #include <QStringList>
 #include <QtMath>
 #include <QTcpSocket>
+#include <QPainter>
+#include "Common/CommonWidgets.h"
 
 const int CUDPPACKETVIDEODATALENGTH = 720;
 
@@ -116,17 +117,11 @@ void UAVSimDataSender::loadXPlaneVideo(const QString &fileName)
 {
     _frameNumber = 0;
 
-    QImage frame;
-    frame.load(fileName);
-    frame = frame.convertToFormat(QImage::Format_ARGB32);
 
-    int compressedSizeEstimation = LZ4_compressBound(XPLANE_IMAGE_DATA_SIZE);
-    _compressedXPlaneData = new quint8[compressedSizeEstimation];
+    _frame.load(fileName);
+    _frame = _frame.convertToFormat(QImage::Format_ARGB32);
 
-    _compressedXPlaneDataSize = LZ4_compress_default((char*)frame.bits(),
-                                                     (char*)_compressedXPlaneData,
-                                                     XPLANE_IMAGE_DATA_SIZE,
-                                                     compressedSizeEstimation);
+
 }
 
 void UAVSimDataSender::sendTelemetryMassage()
@@ -184,6 +179,37 @@ void UAVSimDataSender::sendTelemetryMassage()
 void UAVSimDataSender::sendXPLaneVideoMessage()
 {
     _frameNumber++;
+
+    QPainter painter;
+    painter.begin(&_frame);
+
+
+    QPen pen = painter.pen();
+    pen.setColor(QColor("#FFFFFF"));
+    pen.setWidth(2);
+    painter.setPen(pen);
+
+    QFont font = painter.font();
+    font.setPointSize(15);
+    painter.setFont(font);
+
+    CommonWidgetUtils::drawText(painter, QPoint(100, 100), Qt::AlignTop | Qt::AlignLeft, tr("Frame %1").arg(_frameNumber), true);
+
+
+    painter.end();
+
+    int compressedSizeEstimation = LZ4_compressBound(XPLANE_IMAGE_DATA_SIZE);
+    _compressedXPlaneData = new quint8[compressedSizeEstimation];
+
+    _compressedXPlaneDataSize = LZ4_compress_default((char*)_frame.bits(),
+                                                     (char*)_compressedXPlaneData,
+                                                     XPLANE_IMAGE_DATA_SIZE,
+                                                     compressedSizeEstimation);
+
+
+
+
+
 
     XPLANE_PACKET videoPacket;
     int beginPos = 0, endPos = 0;
