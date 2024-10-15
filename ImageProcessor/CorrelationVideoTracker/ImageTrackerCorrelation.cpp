@@ -57,7 +57,10 @@ void ImageTrackerCorrelation::lockTarget(const QPoint &targetCenter)
 void ImageTrackerCorrelation::unlockTarget()
 {
     if (_correlationTracker != nullptr)
+    {
         _correlationTracker->ExecuteCommand(CorrelationVideoTrackerCommand::RESET, -1, -1, -1, nullptr);
+        qDebug() << "Unlock target";
+    }
 }
 
 void ImageTrackerCorrelation::setTargetSize(int size)

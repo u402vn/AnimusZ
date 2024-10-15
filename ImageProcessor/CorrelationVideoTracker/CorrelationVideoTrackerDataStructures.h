@@ -16,8 +16,8 @@ Constants for correlation video tracker. DO NOT MODIFY THEM!!!
 #define CVT_MAXIMUM_TRACKING_RECTANGLE_HEIGHT 128	/// Maximum vertical size of tracking rectangle.
 #define CVT_MINIMUM_TRACKING_RECTANGLE_WIDTH 16		/// Minimum horizontal size of tracking rectangle.
 #define CVT_MINIMUM_TRACKING_RECTANGLE_HEIGHT 16	/// Minimum vertical size of tracking rectangle.
-#define CVT_MAXIMUM_CORRELATION_SURFACE_WIDTH 105	/// Maximum correlation surface width.
-#define CVT_MAXIMUM_CORRELATION_SURFACE_HEIGHT 105	/// Maximum correlation surface width.
+#define CVT_MAXIMUM_CORRELATION_SURFACE_WIDTH 205	/// Maximum correlation surface width. 105
+#define CVT_MAXIMUM_CORRELATION_SURFACE_HEIGHT 205	/// Maximum correlation surface width. 105
 #define CVT_MINIMUM_CORRELATION_SURFACE_WIDTH 27	/// Minimum correlation surface width.
 #define CVT_MINIMUM_CORRELATION_SURFACE_HEIGHT 27	/// Minimum correlation surface width.
 #define CVT_MINIMUM_FRAME_WIDTH 240					/// Minimum horizontal size of processed video frames.
@@ -43,8 +43,8 @@ Default values for video tracker parameters.
 #define	CVT_DEFAULT_PATTERN_UPDATE_COEFF 0.95f			/// Default coeff for pattern update.
 #define	CVT_DEFAULT_PROBABILITY_COEFF 0.95f				/// Default coeff for probability threshold update.
 #define	CVT_DEFAULT_VELOCITY_COEFF 0.98f				/// Default coeff for velocity update.
-#define CVT_DEFAULT_CORRELATION_SURFACE_WIDTH 105		/// Default correlation surface width.
-#define CVT_DEFAULT_CORRELATION_SURFACE_HEIGHT 105		/// Default correlation surface width.
+#define CVT_DEFAULT_CORRELATION_SURFACE_WIDTH 205		/// Default correlation surface width. 105
+#define CVT_DEFAULT_CORRELATION_SURFACE_HEIGHT 205		/// Default correlation surface width. 105
 #define	CVT_DEFAULT_LOST_MODE_OPTION 0					/// Default LOST mode option.
 #define CVT_DEFAULT_MAXIMUM_NUM_FRAMES_IN_LOST_MODE 256	/// Default maximum number of frames in LOST mode to reset algorithm.
 #define CVT_MAXIMUM_NUM_THREADS 8						/// Maximum number of threads.
