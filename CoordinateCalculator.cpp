@@ -234,10 +234,11 @@ void CoordinateCalculator::updateRemainingTimeToDropBomb(TelemetryDataFrame *tel
         return;
     }
     double timeToDrop = -1;
+
+
     // https://habr.com/ru/articles/481142/
-/*
-    auto context = _scriptEngine.currentContext();
-    auto activationObject = context->activationObject();
+
+    auto activationObject = _scriptEngine.globalObject();
 
     activationObject.setProperty("wind_direction", telemetryFrame->WindDirection);
     activationObject.setProperty("wind_speed",telemetryFrame->WindSpeed);
@@ -264,18 +265,18 @@ void CoordinateCalculator::updateRemainingTimeToDropBomb(TelemetryDataFrame *tel
 
     _scriptEngine.evaluate(_ballisticMacro);
 
-    QScriptValue scriptDropPointTimeProperty = activationObject.property("droppoint_time");
+    auto scriptDropPointTimeProperty = activationObject.property("droppoint_time");
     if (scriptDropPointTimeProperty.isNumber())
         timeToDrop = scriptDropPointTimeProperty.toNumber();
 
-    QScriptValue scriptDebugInfoProperty = activationObject.property("debug_info");
+    auto scriptDebugInfoProperty = activationObject.property("debug_info");
     if (!scriptDebugInfoProperty.isNull())
     {
         QString info = scriptDebugInfoProperty.toString();
         if (!info.isEmpty())
             qDebug() << "TFN: " << telemetryFrame->TelemetryFrameNumber << " DebugInfo: " << info;
     }
-*/
+
 
 
     /*
